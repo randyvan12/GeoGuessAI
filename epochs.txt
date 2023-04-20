@@ -1,0 +1,14 @@
+Epoch 1/7
+1377/1377 [==============================] - 4606s 3s/step - loss: 1.1442 - accuracy: 0.5690 - val_loss: 0.9329 - val_accuracy: 0.6319
+Epoch 2/7
+1377/1377 [==============================] - 4625s 3s/step - loss: 0.7136 - accuracy: 0.7326 - val_loss: 1.1927 - val_accuracy: 0.6129
+Epoch 3/7
+1377/1377 [==============================] - 4616s 3s/step - loss: 0.2802 - accuracy: 0.8993 - val_loss: 1.6509 - val_accuracy: 0.6358
+Epoch 4/7
+1377/1377 [==============================] - 4612s 3s/step - loss: 0.1036 - accuracy: 0.9653 - val_loss: 2.3675 - val_accuracy: 0.6180
+Epoch 5/7
+1377/1377 [==============================] - 4623s 3s/step - loss: 0.0732 - accuracy: 0.9757 - val_loss: 2.3142 - val_accuracy: 0.6331
+Epoch 6/7
+1377/1377 [==============================] - 4613s 3s/step - loss: 0.0519 - accuracy: 0.9830 - val_loss: 2.8151 - val_accuracy: 0.6329
+Epoch 7/7
+1377/1377 [==============================] - 4610s 3s/step - loss: 0.0524 - accuracy: 0.9828 - val_loss: 2.6671 - val_accuracy: 0.6302
