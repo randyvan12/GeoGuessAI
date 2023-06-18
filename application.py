@@ -1,102 +1,68 @@
 import tensorflow as tf
-from tensorflow import keras
-from tensorflow.keras import layers
-from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import GlobalAveragePooling2D, Dense, Dropout, BatchNormalization
+from tensorflow.keras.models import Model
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
 from tensorflow.keras import regularizers
-from tensorflow.keras.callbacks import EarlyStopping
-import numpy as np
-import PIL
-import matplotlib.pyplot as plt
+
+# Change this line to import EfficientNetV2
+from tensorflow.keras.applications import EfficientNetV2  # Import EfficientNetV2
 
 file_location = 'C:/Users/randy/Desktop/archive'
-img_height = 640
-img_width = 640
+img_height = 320  # Reduced image size
+img_width = 320   # Reduced image size
 batch_size = 32
 num_classes = 5
 
-data_augmentation = keras.Sequential([
-    layers.experimental.preprocessing.RandomFlip("horizontal"),
-    layers.experimental.preprocessing.RandomRotation(0.1),
-    layers.experimental.preprocessing.RandomZoom(0.1),
+# Load Data
+
+# ... Your data loading code here ...
+
+# Data augmentation
+data_augmentation = tf.keras.Sequential([
+    tf.keras.layers.experimental.preprocessing.RandomFlip("horizontal_and_vertical"),
+    tf.keras.layers.experimental.preprocessing.RandomRotation(0.3),
+    tf.keras.layers.experimental.preprocessing.RandomZoom(0.3),
+    tf.keras.layers.experimental.preprocessing.RandomContrast(0.3),
 ])
 
-model = Sequential([
-  data_augmentation,
-  layers.Rescaling(1./255, input_shape=(img_height, img_width, 3)),
-  layers.Conv2D(16, 3, padding='same', activation='relu'),
-  layers.MaxPooling2D(),
-  layers.Conv2D(32, 3, padding='same', activation='relu'),
-  layers.MaxPooling2D(),
-  layers.Conv2D(64, 3, padding='same', activation='relu'),
-  layers.MaxPooling2D(),
-  layers.Dropout(0.2),
-  layers.Flatten(),
-  layers.Dense(128, activation='relu', kernel_regularizer=regularizers.l2(0.001)),
-  layers.Dense(num_classes)
-])
+# Change this line to use EfficientNetV2
+base_model = EfficientNetV2(weights='imagenet', include_top=False, input_shape=(img_height, img_width, 3))  # Use EfficientNetV2
 
-train = tf.keras.preprocessing.image_dataset_from_directory(
-    file_location,
-    labels='inferred',
-    label_mode = 'int',
-    #class_names
-    color_mode='rgb',
-    batch_size = batch_size,
-    image_size=(img_height, img_width),
-    # shuffle = True,
-    seed = 123,
-    validation_split = 0.1,
-    subset="training"
-)
-validation = tf.keras.preprocessing.image_dataset_from_directory(
-    file_location,
-    labels = 'inferred',
-    label_mode = 'int',
-    #class_names
-    color_mode = 'rgb',
-    batch_size = batch_size,
-    image_size = (img_height, img_width),
-    # shuffle = True,
-    seed = 123,
-    validation_split = 0.1,
-    subset = "validation"
-)
-class_names = train.class_names
-print(class_names)
+# Unfreeze some layers
+for layer in base_model.layers[-30:]:
+    layer.trainable = True
 
-# model = keras.models.load_model('complete_saved_model/')
-model.compile(optimizer='adam',
-              loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-              metrics=['accuracy'])
+# Build the model
+inputs = tf.keras.Input(shape=(img_height, img_width, 3))
+x = data_augmentation(inputs)
+x = base_model(x, training=False)
+x = GlobalAveragePooling2D()(x)
+x = BatchNormalization()(x)
+x = Dense(512, activation='relu', kernel_regularizer=regularizers.l2(0.001))(x)
+x = Dropout(0.5)(x)
+x = BatchNormalization()(x)
+predictions = Dense(num_classes, activation='softmax')(x)
 
-epochs=10
+# Create the final model
+model = Model(inputs=inputs, outputs=predictions)
+
+# Compile the model
+optimizer = Adam(learning_rate=0.00005)
+model.compile(optimizer=optimizer, loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+
+# Callbacks
 early_stopping = EarlyStopping(monitor='val_loss', patience=3, restore_best_weights=True)
+reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2, patience=2, min_lr=0.00001)
+
+# Training
+epochs = 20
 history = model.fit(
-  train,
-  validation_data=validation,
-  epochs=epochs,
-  callbacks=[early_stopping]
+    train,
+    validation_data=validation,
+    epochs=epochs,
+    callbacks=[early_stopping, reduce_lr]
 )
 
+# Save the model
 model.save('complete_saved_model/')
-acc = history.history['accuracy']
-val_acc = history.history['val_accuracy']
-
-loss = history.history['loss']
-val_loss = history.history['val_loss']
-
-epochs_range = range(epochs)
-
-plt.figure(figsize=(8, 8))
-plt.subplot(1, 2, 1)
-plt.plot(epochs_range, acc, label='Training Accuracy')
-plt.plot(epochs_range, val_acc, label='Validation Accuracy')
-plt.legend(loc='lower right')
-plt.title('Training and Validation Accuracy')
-
-plt.subplot(1, 2, 2)
-plt.plot(epochs_range, loss, label='Training Loss')
-plt.plot(epochs_range, val_loss, label='Validation Loss')
-plt.legend(loc='upper right')
-plt.title('Training and Validation Loss')
-plt.show()
