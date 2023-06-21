@@ -1,12 +1,11 @@
 import tensorflow as tf
-from tensorflow.keras.layers import GlobalAveragePooling2D, Dense, Dropout, BatchNormalization
+from tensorflow.keras.applications.efficientnet_v2 import EfficientNetV2B0  # Change from MobileNetV2 to EfficientNetB0
+from tensorflow.keras.layers import GlobalAveragePooling2D, Dense, Dropout, BatchNormalization  # Added BatchNormalization
 from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
 from tensorflow.keras import regularizers
-
-# Change this line to import EfficientNetV2
-from tensorflow.keras.applications import EfficientNetV2  # Import EfficientNetV2
+import numpy as np
 
 file_location = 'C:/Users/randy/Desktop/archive'
 img_height = 320  # Reduced image size
@@ -16,7 +15,41 @@ num_classes = 5
 
 # Load Data
 
-# ... Your data loading code here ...
+train = tf.keras.preprocessing.image_dataset_from_directory(
+    file_location,
+    labels='inferred',
+    label_mode = 'int',
+    #class_names
+    color_mode='rgb',
+    batch_size = batch_size,
+    image_size=(img_height, img_width),
+    # shuffle = True,
+    seed = 123,
+    validation_split = 0.1,
+    subset="training"
+)
+
+validation = tf.keras.preprocessing.image_dataset_from_directory(
+    file_location,
+    labels = 'inferred',
+    label_mode = 'int',
+    #class_names
+    color_mode = 'rgb',
+    batch_size = batch_size,
+    image_size = (img_height, img_width),
+    # shuffle = True,
+    seed = 123,
+    validation_split = 0.1,
+    subset = "validation"
+)
+
+# Data augmentation
+data_augmentation = tf.keras.Sequential([
+    tf.keras.layers.experimental.preprocessing.RandomFlip("horizontal_and_vertical"),
+    tf.keras.layers.experimental.preprocessing.RandomRotation(0.3), # Increased rotation
+    tf.keras.layers.experimental.preprocessing.RandomZoom(0.3), # Increased zoom
+    tf.keras.layers.experimental.preprocessing.RandomContrast(0.3), # Increased contrast
+])
 
 # Data augmentation
 data_augmentation = tf.keras.Sequential([
@@ -27,7 +60,7 @@ data_augmentation = tf.keras.Sequential([
 ])
 
 # Change this line to use EfficientNetV2
-base_model = EfficientNetV2(weights='imagenet', include_top=False, input_shape=(img_height, img_width, 3))  # Use EfficientNetV2
+base_model = EfficientNetV2B0(weights='imagenet', include_top=False, input_shape=(img_height, img_width, 3))  # Use EfficientNetV2
 
 # Unfreeze some layers
 for layer in base_model.layers[-30:]:
@@ -56,7 +89,7 @@ early_stopping = EarlyStopping(monitor='val_loss', patience=3, restore_best_weig
 reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2, patience=2, min_lr=0.00001)
 
 # Training
-epochs = 20
+epochs = 15
 history = model.fit(
     train,
     validation_data=validation,
@@ -66,3 +99,5 @@ history = model.fit(
 
 # Save the model
 model.save('complete_saved_model/')
+
+print("Done")
