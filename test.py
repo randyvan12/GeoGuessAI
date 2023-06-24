@@ -1,129 +1,61 @@
-import matplotlib.pyplot as plt
-import numpy as np
-import PIL
 import tensorflow as tf
+import numpy as np
+from PIL import Image
 
-from tensorflow import keras
-from tensorflow.keras import layers
-from tensorflow.keras.models import Sequential
+# Load the model
+model = tf.keras.models.load_model('complete_saved_model/')
 
-import pathlib
-import matplotlib.pyplot as plt
+# List of image paths
+image_paths = ['C:/Users/randy/Desktop/archive/Chicago1.jpg', 
+               'C:/Users/randy/Desktop/archive/Chicago2.jpg', 
+               'C:/Users/randy/Desktop/archive/Chicago3.jpg', 
+               'C:/Users/randy/Desktop/archive/Detroit1.jpg',
+               'C:/Users/randy/Desktop/archive/Detroit2.jpg', 
+               'C:/Users/randy/Desktop/archive/Detroit3.jpg',
+               'C:/Users/randy/Desktop/archive/New York1.jpg',
+               'C:/Users/randy/Desktop/archive/New York2.jpg', 
+               'C:/Users/randy/Desktop/archive/New York3.jpg',
+               'C:/Users/randy/Desktop/archive/San1.jpg',
+               'C:/Users/randy/Desktop/archive/San2.jpg', 
+               'C:/Users/randy/Desktop/archive/San3.jpg',
+               'C:/Users/randy/Desktop/archive/Wash1.jpg',
+               'C:/Users/randy/Desktop/archive/Wash2.jpg', 
+               'C:/Users/randy/Desktop/archive/Wash3.jpg']
 
-dataset_url = "https://storage.googleapis.com/download.tensorflow.org/example_images/flower_photos.tgz"
-data_dir = tf.keras.utils.get_file('flower_photos', origin=dataset_url, untar=True)
-data_dir = pathlib.Path(data_dir)
+# Preprocess the images
+img_height = 320
+img_width = 320
+images = []
 
-image_count = len(list(data_dir.glob('*/*.jpg')))
-print(image_count)
+for image_path in image_paths:
+    image = Image.open(image_path)
+    image = image.resize((img_width, img_height))
+    image = np.array(image)
+    image = image / 255.0  # Normalize to [0,1] (optional depending on your model preprocessing)
+    images.append(image)
 
-roses = list(data_dir.glob('roses/*'))
-im = PIL.Image.open(str(roses[0]))
-im.show()
+images = np.stack(images, axis=0)  # Stack images to create a batch
 
+# Make predictions
+predictions = model.predict(images)
 
-batch_size = 32
-img_height = 180
-img_width = 180
+# Decode prediction
+class_names = ['Chicago', 'City of New York', 'Detroit', 'San Francisco', 'Washington']
 
-train_ds = tf.keras.utils.image_dataset_from_directory(
-  data_dir,
-  validation_split=0.2,
-  subset="training",
-  seed=123,
-  image_size=(img_height, img_width),
-  batch_size=batch_size)
-
-val_ds = tf.keras.utils.image_dataset_from_directory(
-  data_dir,
-  validation_split=0.2,
-  subset="validation",
-  seed=123,
-  image_size=(img_height, img_width),
-  batch_size=batch_size)
-
-class_names = train_ds.class_names
-print(class_names)
-
-
-plt.figure(figsize=(10, 10))
-for images, labels in train_ds.take(1):
-  for i in range(9):
-    ax = plt.subplot(3, 3, i + 1)
-    plt.imshow(images[i].numpy().astype("uint8"))
-    plt.title(class_names[labels[i]])
-    plt.axis("off")
-
-AUTOTUNE = tf.data.AUTOTUNE
-
-train_ds = train_ds.cache().shuffle(1000).prefetch(buffer_size=AUTOTUNE)
-val_ds = val_ds.cache().prefetch(buffer_size=AUTOTUNE)
-
-normalization_layer = layers.Rescaling(1./255)
-
-normalized_ds = train_ds.map(lambda x, y: (normalization_layer(x), y))
-image_batch, labels_batch = next(iter(normalized_ds))
-first_image = image_batch[0]
-# Notice the pixel values are now in `[0,1]`.
-print(np.min(first_image), np.max(first_image))
-
-num_classes = len(class_names)
-
-model = Sequential([
-  layers.Rescaling(1./255, input_shape=(img_height, img_width, 3)),
-  layers.Conv2D(16, 3, padding='same', activation='relu'),
-  layers.MaxPooling2D(),
-  layers.Conv2D(32, 3, padding='same', activation='relu'),
-  layers.MaxPooling2D(),
-  layers.Conv2D(64, 3, padding='same', activation='relu'),
-  layers.MaxPooling2D(),
-  layers.Flatten(),
-  layers.Dense(128, activation='relu'),
-  layers.Dense(num_classes)
-])
-
-model.compile(optimizer='adam',
-              loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-              metrics=['accuracy'])
-
-model.summary()
-
-epochs=10
-history = model.fit(
-  train_ds,
-  validation_data=val_ds,
-  epochs=epochs
-)
-
-acc = history.history['accuracy']
-val_acc = history.history['val_accuracy']
-
-loss = history.history['loss']
-val_loss = history.history['val_loss']
-
-epochs_range = range(epochs)
-
-plt.figure(figsize=(8, 8))
-plt.subplot(1, 2, 1)
-plt.plot(epochs_range, acc, label='Training Accuracy')
-plt.plot(epochs_range, val_acc, label='Validation Accuracy')
-plt.legend(loc='lower right')
-plt.title('Training and Validation Accuracy')
-
-plt.subplot(1, 2, 2)
-plt.plot(epochs_range, loss, label='Training Loss')
-plt.plot(epochs_range, val_loss, label='Validation Loss')
-plt.legend(loc='upper right')
-plt.title('Training and Validation Loss')
-plt.show()
-
-data_augmentation = keras.Sequential(
-  [
-    layers.RandomFlip("horizontal",
-                      input_shape=(img_height,
-                                  img_width,
-                                  3)),
-    layers.RandomRotation(0.1),
-    layers.RandomZoom(0.1),
-  ]
-)
+for i in range(len(predictions)):
+    prediction = predictions[i]
+    image_path = image_paths[i]
+    predicted_class_index = np.argmax(prediction)
+    predicted_class_name = class_names[predicted_class_index]
+    
+    # Convert probabilities to percentages
+    probabilities_percentage = [prob * 100 for prob in prediction]
+    
+    print(f'Image {i + 1}:')
+    print(f'   Image Path: {image_path}')
+    print(f'   Predicted Class: {predicted_class_name}')
+    
+    # Print each class probability as percentage
+    print('   Probabilities:')
+    for j, prob in enumerate(probabilities_percentage):
+        print(f'      {class_names[j]}: {prob:.2f}%')
