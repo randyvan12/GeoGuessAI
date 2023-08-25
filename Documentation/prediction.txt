@@ -1,0 +1,136 @@
+First way
+Image 1:
+   Image Path: C:/Users/randy/Desktop/archive/Chicago1.jpg
+   Predicted Class: City of New York
+   Probabilities:
+      Chicago: 11.98%
+      City of New York: 51.25%
+      Detroit: 30.58%
+      San Francisco: 3.77%
+      Washington: 2.41%
+Image 2:
+   Image Path: C:/Users/randy/Desktop/archive/Chicago2.jpg
+   Predicted Class: Chicago
+   Probabilities:
+      Chicago: 75.82%
+      City of New York: 22.26%
+      Detroit: 0.00%
+      San Francisco: 1.29%
+      Washington: 0.63%
+Image 3:
+   Image Path: C:/Users/randy/Desktop/archive/Chicago3.jpg
+   Predicted Class: Chicago
+   Probabilities:
+      Chicago: 84.82%
+      City of New York: 0.13%
+      Detroit: 0.08%
+      San Francisco: 0.27%
+      Washington: 14.70%
+Image 4:
+   Image Path: C:/Users/randy/Desktop/archive/Detroit1.jpg
+   Predicted Class: Detroit
+   Probabilities:
+      Chicago: 8.07%
+      City of New York: 8.54%
+      Detroit: 82.56%
+      San Francisco: 0.20%
+      Washington: 0.63%
+Image 5:
+   Image Path: C:/Users/randy/Desktop/archive/Detroit2.jpg
+   Predicted Class: Chicago
+   Probabilities:
+      Chicago: 63.99%
+      City of New York: 1.41%
+      Detroit: 21.65%
+      San Francisco: 0.28%
+      Washington: 12.67%
+Image 6:
+   Image Path: C:/Users/randy/Desktop/archive/Detroit3.jpg
+   Predicted Class: City of New York
+   Probabilities:
+      Chicago: 1.12%
+      City of New York: 42.94%
+      Detroit: 21.78%
+      San Francisco: 1.87%
+      Washington: 32.29%
+Image 7:
+   Image Path: C:/Users/randy/Desktop/archive/New York1.jpg
+   Predicted Class: City of New York
+   Probabilities:
+      Chicago: 0.74%
+      City of New York: 80.39%
+      Detroit: 0.25%
+      San Francisco: 3.10%
+      Washington: 15.51%
+Image 8:
+   Image Path: C:/Users/randy/Desktop/archive/New York2.jpg
+   Predicted Class: City of New York
+   Probabilities:
+      Chicago: 0.94%
+      City of New York: 49.61%
+      Detroit: 0.14%
+      San Francisco: 0.06%
+      Washington: 49.25%
+Image 9:
+   Image Path: C:/Users/randy/Desktop/archive/New York3.jpg
+   Predicted Class: City of New York
+   Probabilities:
+      Chicago: 0.83%
+      City of New York: 90.71%
+      Detroit: 0.54%
+      San Francisco: 7.61%
+      Washington: 0.30%
+Image 10:
+   Image Path: C:/Users/randy/Desktop/archive/San1.jpg
+   Predicted Class: San Francisco
+   Probabilities:
+      Chicago: 0.13%
+      City of New York: 0.00%
+      Detroit: 1.56%
+      San Francisco: 98.31%
+      Washington: 0.00%
+Image 11:
+   Image Path: C:/Users/randy/Desktop/archive/San2.jpg
+   Predicted Class: San Francisco
+   Probabilities:
+      Chicago: 0.98%
+      City of New York: 0.03%
+      Detroit: 0.01%
+      San Francisco: 98.80%
+      Washington: 0.18%
+Image 12:
+   Image Path: C:/Users/randy/Desktop/archive/San3.jpg
+   Predicted Class: City of New York
+   Probabilities:
+      Chicago: 15.99%
+      City of New York: 80.91%
+      Detroit: 0.07%
+      San Francisco: 0.77%
+      Washington: 2.27%
+Image 13:
+   Image Path: C:/Users/randy/Desktop/archive/Wash1.jpg
+   Predicted Class: Chicago
+   Probabilities:
+      Chicago: 37.29%
+      City of New York: 2.03%
+      Detroit: 16.21%
+      San Francisco: 9.67%
+      Washington: 34.80%
+Image 14:
+   Image Path: C:/Users/randy/Desktop/archive/Wash2.jpg
+   Predicted Class: Washington
+   Probabilities:
+      Chicago: 4.89%
+      City of New York: 27.22%
+      Detroit: 0.13%
+      Washington: 67.71%
+Image 15:
+   Image Path: C:/Users/randy/Desktop/archive/Wash3.jpg
+   Predicted Class: Washington
+   Probabilities:
+      Chicago: 0.04%
+      City of New York: 0.08%
+      Detroit: 0.98%
+      Washington: 98.71%
+
+Second way
